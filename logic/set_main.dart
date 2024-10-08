@@ -65,4 +65,10 @@ class SetMain {
         return;
     }
   }
+
+  getBackToMainPage(String printText) {
+    print(printText);
+    setMainPage();
+    return;
+  }
 }

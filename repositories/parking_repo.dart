@@ -3,12 +3,10 @@ import '../models/parking.dart';
 import 'parking_space_repo.dart';
 import 'vehicle_repo.dart';
 
-class ParkingRepository {
+class ParkingRepository extends SetMain {
   ParkingRepository._privateConstructor();
 
   static final instance = ParkingRepository._privateConstructor();
-
-  final SetMain setMain = new SetMain();
 
   final VehicleRepository vehicleRepository = VehicleRepository.instance;
   final ParkingSpaceRepository parkingSpaceRepository =
@@ -21,6 +19,7 @@ class ParkingRepository {
       final addVehicle = vehicleRepository.vehicleList
           .where((vehicle) => vehicle.regNr == regNr)
           .first;
+
       final addParkingSpace = parkingSpaceRepository.parkingSpaceList
           .where((p) => p.id == parkingPlaceId)
           .first;
@@ -34,10 +33,8 @@ class ParkingRepository {
 
       parkingList.add(addParking);
     } catch (err) {
-      print(
+      getBackToMainPage(
           'Det gick fel, du omdirigeras till startsidan, se till att du lagt till personer, fordon och parkeringsplatser innan du forsätter!');
-      setMain.setMainPage();
-      return;
     }
   }
 
@@ -54,18 +51,14 @@ class ParkingRepository {
 
   void updateParkings(String parkingId, DateTime endTime) {
     if (parkingList.isEmpty) {
-      print(
+      getBackToMainPage(
           'Finns inga pågående parkeringar att uppdatera, testa att lägga till parkeringar först');
-      setMain.setMainPage();
-      return;
     }
 
     final foundParkingIndex = parkingList.indexWhere((v) => v.id == parkingId);
 
     if (foundParkingIndex == -1) {
-      print('Finns ingen parkering med det angivna id');
-      setMain.setMainPage();
-      return;
+      getBackToMainPage('Finns ingen parkering med det angivna id');
     }
 
     parkingList[foundParkingIndex].endTime = endTime;
@@ -73,18 +66,14 @@ class ParkingRepository {
 
   void deleteParkings(String parkingId) {
     if (parkingList.isEmpty) {
-      print(
+      getBackToMainPage(
           'Finns inga pågående parkeringar att radera, testa att lägga till parkeringar först');
-      setMain.setMainPage();
-      return;
     }
 
     final foundParkingIndex = parkingList.indexWhere((v) => v.id == parkingId);
 
     if (foundParkingIndex == -1) {
-      print('Finns ingen parkering med det angivna id');
-      setMain.setMainPage();
-      return;
+      getBackToMainPage('Finns ingen parkering med det angivna id');
     }
 
     final parkingToDelete = parkingList[foundParkingIndex];

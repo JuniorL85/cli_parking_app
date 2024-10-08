@@ -3,7 +3,7 @@ import '../models/person.dart';
 import '../models/vehicle.dart';
 import 'vehicle_repo.dart';
 
-class PersonRepository {
+class PersonRepository extends SetMain {
   PersonRepository._privateConstructor();
 
   static final instance = PersonRepository._privateConstructor();
@@ -16,8 +16,6 @@ class PersonRepository {
       socialSecurityNumber: '131313131313',
     )
   ];
-
-  final SetMain setMain = new SetMain();
 
   void addPerson(Person person) {
     personList.add(person);
@@ -36,19 +34,15 @@ class PersonRepository {
 
   void updatePersons(Person person) {
     if (personList.isEmpty) {
-      print(
+      getBackToMainPage(
           'Finns inga personer att uppdatera, testa att lägga till en person först');
-      setMain.setMainPage();
-      return;
     }
 
     final foundPersonIndex = personList.indexWhere(
         (pers) => pers.socialSecurityNumber == person.socialSecurityNumber);
 
     if (foundPersonIndex == -1) {
-      print('Finns ingen person med det angivna personnumret');
-      setMain.setMainPage();
-      return;
+      getBackToMainPage('Finns ingen person med det angivna personnumret');
     }
 
     personList[foundPersonIndex] = person;
@@ -56,17 +50,18 @@ class PersonRepository {
 
   void deletePerson(String socialSecurityNumber) {
     if (personList.isEmpty) {
-      print(
+      getBackToMainPage(
           'Finns inga personer att radera, testa att lägga till en person först');
-      setMain.setMainPage();
-      return;
     }
+
     final personToDelete = personList.firstWhere(
         (person) => person.socialSecurityNumber == socialSecurityNumber);
+
     final Vehicle personToDeleteInVehicleList = vehicleRepository.vehicleList
         .firstWhere((v) =>
             v.owner.socialSecurityNumber ==
             personToDelete.socialSecurityNumber);
+
     personList.remove(personToDelete);
     vehicleRepository.vehicleList.remove(personToDeleteInVehicleList);
     print(

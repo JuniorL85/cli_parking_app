@@ -1,12 +1,10 @@
 import '../logic/set_main.dart';
 import '../models/parking_space.dart';
 
-class ParkingSpaceRepository {
+class ParkingSpaceRepository extends SetMain {
   ParkingSpaceRepository._privateConstructor();
 
   static final instance = ParkingSpaceRepository._privateConstructor();
-
-  final SetMain setMain = new SetMain();
 
   List<ParkingSpace> parkingSpaceList = [
     ParkingSpace(
@@ -32,19 +30,15 @@ class ParkingSpaceRepository {
 
   void updateParkingSpace(ParkingSpace parkingSpace) {
     if (parkingSpaceList.isEmpty) {
-      print(
+      getBackToMainPage(
           'Finns inga parkeringsplatser att uppdatera, testa att lägga till parkeringsplatser först');
-      setMain.setMainPage();
-      return;
     }
 
     final foundParkingSpaceIndex =
         parkingSpaceList.indexWhere((v) => v.id == parkingSpace.id);
 
     if (foundParkingSpaceIndex == -1) {
-      print('Finns ingen parkeringsplats med det angivna id');
-      setMain.setMainPage();
-      return;
+      getBackToMainPage('Finns ingen parkeringsplats med det angivna id');
     }
 
     parkingSpaceList[foundParkingSpaceIndex] = parkingSpace;
@@ -52,13 +46,13 @@ class ParkingSpaceRepository {
 
   void deleteParkingSpace(String parkingPlaceId) {
     if (parkingSpaceList.isEmpty) {
-      print(
+      getBackToMainPage(
           'Finns inga parkeringsplatser att radera, testa att lägga till parkeringsplatser först');
-      setMain.setMainPage();
-      return;
     }
+
     final parkingSpaceToDelete =
         parkingSpaceList.firstWhere((parking) => parking.id == parkingPlaceId);
+
     parkingSpaceList.remove(parkingSpaceToDelete);
     print(
         'Du har raderat följande parkeringsplats: ${parkingSpaceToDelete.id} - ${parkingSpaceToDelete.address}');
