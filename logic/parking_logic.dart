@@ -65,7 +65,7 @@ class ParkingLogic extends SetMain {
       parkingPlaceIdInput = stdin.readLineSync();
     }
 
-    stdout.write('Fyll i sluttid för din parkering: ');
+    stdout.write('Fyll i sluttid för din parkering (hh:mm): ');
     var endTimeInput = stdin.readLineSync();
 
     if (endTimeInput == null || endTimeInput.isEmpty) {
