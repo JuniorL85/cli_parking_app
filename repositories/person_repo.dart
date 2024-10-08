@@ -33,11 +33,6 @@ class PersonRepository extends SetMain {
   }
 
   void updatePersons(Person person) {
-    if (personList.isEmpty) {
-      getBackToMainPage(
-          'Finns inga personer att uppdatera, testa att lägga till en person först');
-    }
-
     final foundPersonIndex = personList.indexWhere(
         (pers) => pers.socialSecurityNumber == person.socialSecurityNumber);
 
@@ -49,11 +44,6 @@ class PersonRepository extends SetMain {
   }
 
   void deletePerson(String socialSecurityNumber) {
-    if (personList.isEmpty) {
-      getBackToMainPage(
-          'Finns inga personer att radera, testa att lägga till en person först');
-    }
-
     final personToDelete = personList.firstWhere(
         (person) => person.socialSecurityNumber == socialSecurityNumber);
 

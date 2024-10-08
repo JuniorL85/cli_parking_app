@@ -34,11 +34,6 @@ class VehicleRepository extends SetMain {
   }
 
   void updateVehicles(Vehicle vehicle, oldRegNr) {
-    if (vehicleList.isEmpty) {
-      getBackToMainPage(
-          'Finns inga fordon att uppdatera, testa att lägga till ett fordon först');
-    }
-
     final foundVehicleIndex =
         vehicleList.indexWhere((v) => v.regNr == oldRegNr);
 
@@ -51,13 +46,11 @@ class VehicleRepository extends SetMain {
   }
 
   void deleteVehicle(String regNr) {
-    if (vehicleList.isEmpty) {
-      getBackToMainPage(
-          'Finns inga fordon att radera, testa att lägga till ett fordon först');
-    }
     final vehicleToDelete =
         vehicleList.firstWhere((vehicle) => vehicle.regNr == regNr);
+
     vehicleList.remove(vehicleToDelete);
+
     print(
         'Du har raderat följande fordon: ${vehicleToDelete.regNr} - ${vehicleToDelete.vehicleType.name}');
   }

@@ -4,9 +4,8 @@ import '../models/person.dart';
 import '../repositories/person_repo.dart';
 import 'set_main.dart';
 
-class PersonLogic {
+class PersonLogic extends SetMain {
   final PersonRepository personRepository = PersonRepository.instance;
-  final SetMain setMain = new SetMain();
 
   List<String> texts = [
     'Du har valt att hantera Personer. Vad vill du göra?\n',
@@ -33,7 +32,7 @@ class PersonLogic {
         _deletePersonLogic();
         break;
       case 5:
-        setMain.setMainPage();
+        setMainPage();
         return;
       default:
         print('Ogiltigt val');
@@ -44,30 +43,42 @@ class PersonLogic {
   void _addPersonLogic() {
     print('\nDu har valt att skapa en ny person\n');
     stdout.write('Fyll i namn: ');
-    var name = stdin.readLineSync();
+    var nameInput = stdin.readLineSync();
 
-    if (name == null || name.isEmpty) {
+    if (nameInput == null || nameInput.isEmpty) {
       stdout
           .write('Du har inte fyllt i något namn, vänligen fyll i ett namn: ');
-      name = stdin.readLineSync();
+      nameInput = stdin.readLineSync();
+    }
+
+    // Dubbelkollar så inga tomma värden skickas
+    if (nameInput == null || nameInput.isEmpty) {
+      setMainPage();
+      return;
     }
 
     stdout.write('Fyll i personnummer (12 siffror utan bindestreck): ');
-    var socialSecurityNr = stdin.readLineSync();
+    var socialSecurityNrInput = stdin.readLineSync();
 
-    if (socialSecurityNr == null || socialSecurityNr.isEmpty) {
+    if (socialSecurityNrInput == null || socialSecurityNrInput.isEmpty) {
       stdout.write(
           'Du har inte fyllt i något personnummer, vänligen fyll i ett personnummer: ');
-      socialSecurityNr = stdin.readLineSync();
+      socialSecurityNrInput = stdin.readLineSync();
+    }
+
+    // Dubbelkollar så inga tomma värden skickas
+    if (socialSecurityNrInput == null || socialSecurityNrInput.isEmpty) {
+      setMainPage();
+      return;
     }
 
     personRepository.addPerson(
-        Person(name: name!, socialSecurityNumber: socialSecurityNr!));
+        Person(name: nameInput, socialSecurityNumber: socialSecurityNrInput));
     personRepository.getAllPersons();
 
     stdout.write('Tryck på något för att komma till huvudmenyn');
     stdin.readLineSync();
-    setMain.setMainPage();
+    setMainPage();
   }
 
   void _showAllPersonsLogic() {
@@ -75,25 +86,29 @@ class PersonLogic {
     personRepository.getAllPersons();
     stdout.write('Tryck på något för att komma till huvudmenyn');
     stdin.readLineSync();
-    setMain.setMainPage();
+    setMainPage();
   }
 
   void _updatePersonsLogic() {
     print('\nDu har valt att uppdatera en person\n');
     if (personRepository.personList.isEmpty) {
-      print(
+      getBackToMainPage(
           'Finns inga personer att uppdatera, testa att lägga till en person först');
-      setMain.setMainPage();
-      return;
     }
     stdout.write(
         'Fyll i personnummer på personen du vill uppdatera (12 siffror utan bindestreck): ');
-    var socialSecurityNr = stdin.readLineSync();
+    var socialSecurityNrInput = stdin.readLineSync();
 
-    if (socialSecurityNr == null || socialSecurityNr.isEmpty) {
+    if (socialSecurityNrInput == null || socialSecurityNrInput.isEmpty) {
       stdout.write(
           'Du har inte fyllt i något personnummer, vänligen fyll i ett personnummer: ');
-      socialSecurityNr = stdin.readLineSync();
+      socialSecurityNrInput = stdin.readLineSync();
+    }
+
+    // Dubbelkollar så inga tomma värden skickas
+    if (socialSecurityNrInput == null || socialSecurityNrInput.isEmpty) {
+      setMainPage();
+      return;
     }
 
     print('Vill du uppdatera personens namn? Annars tryck Enter: ');
@@ -104,8 +119,8 @@ class PersonLogic {
       print('Du gjorde ingen ändring!');
     } else {
       updatedName = name;
-      personRepository.updatePersons(
-          Person(name: updatedName, socialSecurityNumber: socialSecurityNr!));
+      personRepository.updatePersons(Person(
+          name: updatedName, socialSecurityNumber: socialSecurityNrInput));
     }
 
     print('\nFöljande personer är kvar i listan\n');
@@ -113,32 +128,36 @@ class PersonLogic {
 
     stdout.write('Tryck på något för att komma till huvudmenyn');
     stdin.readLineSync();
-    setMain.setMainPage();
+    setMainPage();
   }
 
   void _deletePersonLogic() {
     print('\nDu har valt att ta bort en person\n');
     if (personRepository.personList.isEmpty) {
-      print(
+      getBackToMainPage(
           'Finns inga personer att radera, testa att lägga till en person först');
-      setMain.setMainPage();
-      return;
     }
     stdout.write('Fyll i personnummer (12 siffror utan bindestreck): ');
-    var socialSecurityNr = stdin.readLineSync();
+    var socialSecurityNrInput = stdin.readLineSync();
 
-    if (socialSecurityNr == null || socialSecurityNr.isEmpty) {
+    if (socialSecurityNrInput == null || socialSecurityNrInput.isEmpty) {
       stdout.write(
           'Du har inte fyllt i något personnummer, vänligen fyll i ett personnummer: ');
-      socialSecurityNr = stdin.readLineSync();
+      socialSecurityNrInput = stdin.readLineSync();
     }
 
-    personRepository.deletePerson(socialSecurityNr!);
+    // Dubbelkollar så inga tomma värden skickas
+    if (socialSecurityNrInput == null || socialSecurityNrInput.isEmpty) {
+      setMainPage();
+      return;
+    }
+
+    personRepository.deletePerson(socialSecurityNrInput);
     print('\nFöljande personer är kvar i listan\n');
     personRepository.getAllPersons();
 
     stdout.write('Tryck på något för att komma till huvudmenyn');
     stdin.readLineSync();
-    setMain.setMainPage();
+    setMainPage();
   }
 }

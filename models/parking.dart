@@ -15,9 +15,9 @@ class Parking {
     String? id,
   }) : id = id ?? idGenerator();
 
+  final String id;
   final Vehicle vehicle;
   final ParkingSpace parkingSpace;
   final DateTime startTime;
   DateTime endTime;
-  final String id;
 }

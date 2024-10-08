@@ -3,9 +3,8 @@ import 'dart:io';
 import '../repositories/parking_repo.dart';
 import 'set_main.dart';
 
-class ParkingLogic {
+class ParkingLogic extends SetMain {
   final ParkingRepository parkingRepository = ParkingRepository.instance;
-  final SetMain setMain = new SetMain();
 
   List<String> texts = [
     'Du har valt att hantera Parkeringar. Vad vill du göra?\n',
@@ -32,7 +31,7 @@ class ParkingLogic {
         _deleteParkingLogic();
         break;
       case 5:
-        setMain.setMainPage();
+        setMainPage();
         return;
       default:
         print('Ogiltigt val');
@@ -49,49 +48,54 @@ class ParkingLogic {
   void _addParkingLogic() {
     print('\nDu har valt att skapa en ny parkering\n');
     stdout.write('Fyll i registreringsnummer: ');
-    var regNr = stdin.readLineSync();
+    var regNrInput = stdin.readLineSync();
 
-    if (regNr == null || regNr.isEmpty) {
+    if (regNrInput == null || regNrInput.isEmpty) {
       stdout.write(
           'Du har inte fyllt i något registreringsnummer, vänligen fyll i ett registreringsnummer: ');
-      regNr = stdin.readLineSync();
+      regNrInput = stdin.readLineSync();
     }
 
     stdout.write('Fyll i id för parkeringsplatsen: ');
-    var parkingPlaceId = stdin.readLineSync();
+    var parkingPlaceIdInput = stdin.readLineSync();
 
-    if (parkingPlaceId == null || parkingPlaceId.isEmpty) {
+    if (parkingPlaceIdInput == null || parkingPlaceIdInput.isEmpty) {
       stdout.write(
           'Du har inte fyllt i något id för parkeringsplatsen, vänligen fyll i ett id för parkeringsplatsen: ');
-      parkingPlaceId = stdin.readLineSync();
+      parkingPlaceIdInput = stdin.readLineSync();
     }
 
     stdout.write('Fyll i sluttid för din parkering: ');
-    var endTime = stdin.readLineSync();
+    var endTimeInput = stdin.readLineSync();
 
-    if (endTime == null || endTime.isEmpty) {
+    if (endTimeInput == null || endTimeInput.isEmpty) {
       stdout.write(
           'Du har inte fyllt i någon sluttid för din parkering, vänligen fyll i en sluttid för din parkering: ');
-      endTime = stdin.readLineSync();
+      endTimeInput = stdin.readLineSync();
     }
 
-    if (parkingPlaceId == null ||
-        parkingPlaceId.isEmpty ||
-        endTime == null ||
-        endTime.isEmpty ||
-        regNr == null ||
-        regNr.isEmpty) {
-      setMain.setMainPage();
+    if (parkingPlaceIdInput == null ||
+        parkingPlaceIdInput.isEmpty ||
+        endTimeInput == null ||
+        endTimeInput.isEmpty ||
+        regNrInput == null ||
+        regNrInput.isEmpty) {
+      setMainPage();
       return;
     }
 
     parkingRepository.addParking(
-        regNr, parkingPlaceId, DateTime.tryParse(_getCorrectDate(endTime))!);
+      regNrInput,
+      parkingPlaceIdInput,
+      DateTime.tryParse(
+        _getCorrectDate(endTimeInput),
+      )!,
+    );
     parkingRepository.getAllParkings();
 
     stdout.write('Tryck på något för att komma till huvudmenyn');
     stdin.readLineSync();
-    setMain.setMainPage();
+    setMainPage();
   }
 
   void _showAllParkingsLogic() {
@@ -99,29 +103,27 @@ class ParkingLogic {
     parkingRepository.getAllParkings();
     stdout.write('Tryck på något för att komma till huvudmenyn');
     stdin.readLineSync();
-    setMain.setMainPage();
+    setMainPage();
   }
 
   void _updateParkingLogic() {
     print('\nDu har valt att uppdatera en parkering\n');
     if (parkingRepository.parkingList.isEmpty) {
-      print(
+      getBackToMainPage(
           'Finns inga parkeringar att uppdatera, testa att lägga till en parkering först');
-      setMain.setMainPage();
-      return;
     }
     stdout
         .write('Fyll i id för parkeringen på parkeringen du vill uppdatera: ');
-    var parkingId = stdin.readLineSync();
+    var parkingIdInput = stdin.readLineSync();
 
-    if (parkingId == null || parkingId.isEmpty) {
+    if (parkingIdInput == null || parkingIdInput.isEmpty) {
       stdout.write(
           'Du har inte fyllt i något id för parkeringen, vänligen fyll i ett id för parkeringen: ');
-      parkingId = stdin.readLineSync();
+      parkingIdInput = stdin.readLineSync();
     }
 
-    if (parkingId == null || parkingId.isEmpty) {
-      setMain.setMainPage();
+    if (parkingIdInput == null || parkingIdInput.isEmpty) {
+      setMainPage();
       return;
     }
 
@@ -134,7 +136,7 @@ class ParkingLogic {
     } else {
       endTime = endTimeInput;
       parkingRepository.updateParkings(
-          parkingId, DateTime.tryParse(_getCorrectDate(endTime))!);
+          parkingIdInput, DateTime.tryParse(_getCorrectDate(endTime))!);
     }
 
     print('\nFöljande parkeringar är kvar i listan\n');
@@ -142,37 +144,35 @@ class ParkingLogic {
 
     stdout.write('Tryck på något för att komma till huvudmenyn');
     stdin.readLineSync();
-    setMain.setMainPage();
+    setMainPage();
   }
 
   void _deleteParkingLogic() {
     print('\nDu har valt att ta bort en parkering\n');
     if (parkingRepository.parkingList.isEmpty) {
-      print(
+      getBackToMainPage(
           'Finns inga parkeringar att radera, testa att lägga till en parkering först');
-      setMain.setMainPage();
-      return;
     }
     stdout.write('Fyll i id för parkeringen: ');
-    var parkingId = stdin.readLineSync();
+    var parkingIdInput = stdin.readLineSync();
 
-    if (parkingId == null || parkingId.isEmpty) {
+    if (parkingIdInput == null || parkingIdInput.isEmpty) {
       stdout.write(
           'Du har inte fyllt i något id för parkeringen, vänligen fyll i ett id för parkeringen: ');
-      parkingId = stdin.readLineSync();
+      parkingIdInput = stdin.readLineSync();
     }
 
-    if (parkingId == null || parkingId.isEmpty) {
-      setMain.setMainPage();
+    if (parkingIdInput == null || parkingIdInput.isEmpty) {
+      setMainPage();
       return;
     }
 
-    parkingRepository.deleteParkings(parkingId);
+    parkingRepository.deleteParkings(parkingIdInput);
     print('\nFöljande parkeringar är kvar i listan\n');
     parkingRepository.getAllParkings();
 
     stdout.write('Tryck på något för att komma till huvudmenyn');
     stdin.readLineSync();
-    setMain.setMainPage();
+    setMainPage();
   }
 }

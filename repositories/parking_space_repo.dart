@@ -29,11 +29,6 @@ class ParkingSpaceRepository extends SetMain {
   }
 
   void updateParkingSpace(ParkingSpace parkingSpace) {
-    if (parkingSpaceList.isEmpty) {
-      getBackToMainPage(
-          'Finns inga parkeringsplatser att uppdatera, testa att lägga till parkeringsplatser först');
-    }
-
     final foundParkingSpaceIndex =
         parkingSpaceList.indexWhere((v) => v.id == parkingSpace.id);
 
@@ -45,11 +40,6 @@ class ParkingSpaceRepository extends SetMain {
   }
 
   void deleteParkingSpace(String parkingPlaceId) {
-    if (parkingSpaceList.isEmpty) {
-      getBackToMainPage(
-          'Finns inga parkeringsplatser att radera, testa att lägga till parkeringsplatser först');
-    }
-
     final parkingSpaceToDelete =
         parkingSpaceList.firstWhere((parking) => parking.id == parkingPlaceId);
 

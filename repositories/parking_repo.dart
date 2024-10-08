@@ -50,11 +50,6 @@ class ParkingRepository extends SetMain {
   }
 
   void updateParkings(String parkingId, DateTime endTime) {
-    if (parkingList.isEmpty) {
-      getBackToMainPage(
-          'Finns inga pågående parkeringar att uppdatera, testa att lägga till parkeringar först');
-    }
-
     final foundParkingIndex = parkingList.indexWhere((v) => v.id == parkingId);
 
     if (foundParkingIndex == -1) {
@@ -65,11 +60,6 @@ class ParkingRepository extends SetMain {
   }
 
   void deleteParkings(String parkingId) {
-    if (parkingList.isEmpty) {
-      getBackToMainPage(
-          'Finns inga pågående parkeringar att radera, testa att lägga till parkeringar först');
-    }
-
     final foundParkingIndex = parkingList.indexWhere((v) => v.id == parkingId);
 
     if (foundParkingIndex == -1) {

@@ -6,10 +6,9 @@ import '../repositories/person_repo.dart';
 import '../repositories/vehicle_repo.dart';
 import 'set_main.dart';
 
-class VehicleLogic {
+class VehicleLogic extends SetMain {
   final VehicleRepository vehicleRepository = VehicleRepository.instance;
   final PersonRepository personRepository = PersonRepository.instance;
-  final SetMain setMain = new SetMain();
 
   List<String> texts = [
     'Du har valt att hantera Fordon. Vad vill du göra?\n',
@@ -36,7 +35,7 @@ class VehicleLogic {
         _deleteVehicleLogic();
         break;
       case 5:
-        setMain.setMainPage();
+        setMainPage();
         return;
       default:
         print('Ogiltigt val');
@@ -48,55 +47,61 @@ class VehicleLogic {
     print('\nDu har valt att lägga till ett nytt fordon\n');
     stdout.write(
         'Fyll i personnummer på ägaren (du måste ha skapat en ny person först, har du inte gjort det så skriv 1 så kommer du tillbaka till huvudmenyn): ');
-    var socialSecurityNumber = stdin.readLineSync();
+    var socialSecurityNumberInput = stdin.readLineSync();
 
-    if (socialSecurityNumber == null || socialSecurityNumber.isEmpty) {
+    if (socialSecurityNumberInput == null ||
+        socialSecurityNumberInput.isEmpty) {
       stdout.write(
           'Du har inte fyllt i något personnummer, vänligen fyll i ett personnummer: ');
-      socialSecurityNumber = stdin.readLineSync();
+      socialSecurityNumberInput = stdin.readLineSync();
     }
 
-    // En extra koll för att ge användaren en chans till
-    if (socialSecurityNumber == null || socialSecurityNumber.isEmpty) {
-      setMain.setMainPage();
+    // Dubbelkollar så inga tomma värden skickas
+    if (socialSecurityNumberInput == null ||
+        socialSecurityNumberInput.isEmpty) {
+      setMainPage();
       return;
     }
 
-    if (int.parse(socialSecurityNumber) == 1) {
-      setMain.setMainPage();
+    if (int.parse(socialSecurityNumberInput) == 1) {
+      setMainPage();
       return;
     }
 
     try {
       // Lägg till rätt person på fordon
       final personToAdd = personRepository.personList.firstWhere(
-          (person) => person.socialSecurityNumber == socialSecurityNumber);
+          (person) => person.socialSecurityNumber == socialSecurityNumberInput);
 
       stdout.write('Fyll i registreringsnummer: ');
-      var regNr = stdin.readLineSync();
+      var regNrInput = stdin.readLineSync();
 
-      if (regNr == null || regNr.isEmpty) {
+      if (regNrInput == null || regNrInput.isEmpty) {
         stdout.write(
             'Du har inte fyllt i något registreringsnummer, vänligen fyll i ett registreringsnummer: ');
-        regNr = stdin.readLineSync();
+        regNrInput = stdin.readLineSync();
       }
 
       stdout.write(
           'Fyll i vilken typ av fordon det är med en siffra (1: Bil, 2: Motorcykel, 3: Annat): ');
-      var type = stdin.readLineSync();
+      var typeInput = stdin.readLineSync();
 
-      if (type == null || type.isEmpty) {
+      if (typeInput == null || typeInput.isEmpty) {
         stdout.write(
             'Du har inte fyllt i någon typ, vänligen fyll i en siffra (1: Bil, 2: Motorcykel, 3: Annat): ');
-        type = stdin.readLineSync();
+        typeInput = stdin.readLineSync();
       }
 
-      if (type == null || type.isEmpty || regNr == null || regNr.isEmpty) {
-        setMain.setMainPage();
+      // Dubbelkollar så inga tomma värden skickas
+      if (typeInput == null ||
+          typeInput.isEmpty ||
+          regNrInput == null ||
+          regNrInput.isEmpty) {
+        setMainPage();
         return;
       }
 
-      int pickedOption = int.parse(type);
+      int pickedOption = int.parse(typeInput);
       VehicleType vehicleType = VehicleType.car;
       // Lägg till rätt fordonstyp
       switch (pickedOption) {
@@ -112,7 +117,7 @@ class VehicleLogic {
       }
 
       vehicleRepository.addVehicle(Vehicle(
-        regNr: regNr.toUpperCase(),
+        regNr: regNrInput.toUpperCase(),
         vehicleType: vehicleType,
         owner: personToAdd,
       ));
@@ -120,10 +125,10 @@ class VehicleLogic {
 
       stdout.write('Tryck på något för att komma till huvudmenyn');
       stdin.readLineSync();
-      setMain.setMainPage();
+      setMainPage();
     } catch (error) {
       stdout.write('Felaktigt personnummer du omdirigeras till huvudmenyn');
-      setMain.setMainPage();
+      setMainPage();
       return;
     }
   }
@@ -133,42 +138,40 @@ class VehicleLogic {
     vehicleRepository.getAllVehicles();
     stdout.write('Tryck på något för att komma till huvudmenyn');
     stdin.readLineSync();
-    setMain.setMainPage();
+    setMainPage();
   }
 
   void _updateVehiclesLogic() {
-    final vehicleList = vehicleRepository.vehicleList;
     print('\nDu har valt att uppdatera ett fordon\n');
-    if (vehicleList.isEmpty) {
-      print(
+    if (vehicleRepository.vehicleList.isEmpty) {
+      getBackToMainPage(
           'Finns inga fordon att uppdatera, testa att lägga till ett fordon först');
-      setMain.setMainPage();
-      return;
     }
     stdout.write('Fyll i registreringsnummer på fordonet du vill uppdatera: ');
-    var regNr = stdin.readLineSync()!.toUpperCase();
+    var regNrInput = stdin.readLineSync()!.toUpperCase();
 
-    if (regNr.isEmpty) {
+    if (regNrInput.isEmpty) {
       stdout.write(
           'Du har inte fyllt i något registreringsnummer, vänligen fyll i ett registreringsnummer: ');
-      regNr = stdin.readLineSync()!.toUpperCase();
+      regNrInput = stdin.readLineSync()!.toUpperCase();
     }
 
-    // En extra koll för att ge användaren en chans till
-    if (regNr.isEmpty) {
-      setMain.setMainPage();
+    // Dubbelkollar så inga tomma värden skickas
+    if (regNrInput.isEmpty) {
+      setMainPage();
       return;
     }
 
-    final vehicleOwnerInfo = vehicleList
-        .where((p) => p.regNr == regNr)
+    final vehicleOwnerInfo = vehicleRepository.vehicleList
+        .where((p) => p.regNr == regNrInput)
         .map((v) => Person(
             name: v.owner.name,
             socialSecurityNumber: v.owner.socialSecurityNumber))
         .first;
 
-    VehicleType vehicleType =
-        vehicleList.firstWhere((v) => v.regNr == regNr).vehicleType;
+    VehicleType vehicleType = vehicleRepository.vehicleList
+        .firstWhere((v) => v.regNr == regNrInput)
+        .vehicleType;
 
     print('Vänligen fyll i det nya registreringsnumret på fordonet: ');
     var regnr = stdin.readLineSync()!.toUpperCase();
@@ -184,7 +187,7 @@ class VehicleLogic {
             vehicleType: vehicleType,
             owner: vehicleOwnerInfo,
           ),
-          regNr);
+          regNrInput);
     }
 
     print('\nFöljande fordon är kvar i listan\n');
@@ -192,38 +195,36 @@ class VehicleLogic {
 
     stdout.write('Tryck på något för att komma till huvudmenyn');
     stdin.readLineSync();
-    setMain.setMainPage();
+    setMainPage();
   }
 
   void _deleteVehicleLogic() {
     print('\nDu har valt att ta bort ett fordon\n');
     if (vehicleRepository.vehicleList.isEmpty) {
-      print(
+      getBackToMainPage(
           'Finns inga fordon att radera, testa att lägga till ett fordon först');
-      setMain.setMainPage();
-      return;
     }
     stdout.write('Fyll i registreringsnummer: ');
-    var regNr = stdin.readLineSync();
+    var regNrInput = stdin.readLineSync();
 
-    if (regNr == null || regNr.isEmpty) {
+    if (regNrInput == null || regNrInput.isEmpty) {
       stdout.write(
           'Du har inte fyllt i något registreringsnummer, vänligen fyll i ett registreringsnummer: ');
-      regNr = stdin.readLineSync();
+      regNrInput = stdin.readLineSync();
     }
 
-    // En extra koll för att ge användaren en chans till
-    if (regNr == null || regNr.isEmpty) {
-      setMain.setMainPage();
+    // Dubbelkollar så inga tomma värden skickas
+    if (regNrInput == null || regNrInput.isEmpty) {
+      setMainPage();
       return;
     }
 
-    vehicleRepository.deleteVehicle(regNr.toUpperCase());
+    vehicleRepository.deleteVehicle(regNrInput.toUpperCase());
     print('\nFöljande fordon är kvar i listan\n');
     vehicleRepository.getAllVehicles();
 
     stdout.write('Tryck på något för att komma till huvudmenyn');
     stdin.readLineSync();
-    setMain.setMainPage();
+    setMainPage();
   }
 }
