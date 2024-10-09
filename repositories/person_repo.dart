@@ -25,7 +25,7 @@ class PersonRepository extends SetMain {
     if (personList.isNotEmpty) {
       for (var (index, person) in personList.indexed) {
         print(
-            '${index + 1}. Namn: ${person.name},  Personnummer: ${person.socialSecurityNumber}');
+            '${index + 1}. Id: ${person.id}\n Namn: ${person.name}\n  Personnummer: ${person.socialSecurityNumber}\n');
       }
     } else {
       print('Inga personer att visa i nuläget. Testa att lägga till personer.');

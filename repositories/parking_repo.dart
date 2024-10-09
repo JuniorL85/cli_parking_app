@@ -50,7 +50,7 @@ class ParkingRepository extends SetMain {
     if (parkingList.isNotEmpty) {
       for (var (index, park) in parkingList.indexed) {
         print(
-            '${index + 1}. Id: ${park.id}, Parkering: ${park.parkingSpace.address}, Time (start and end): ${park.startTime}-${park.endTime}, RegNr: ${park.vehicle.regNr}');
+            '${index + 1}. Id: ${park.id}\n Parkering: ${park.parkingSpace.address}\n Time (start and end): ${park.startTime}-${park.endTime}\n RegNr: ${park.vehicle.regNr}\n');
       }
     } else {
       print('Inga parkeringar att visa för tillfället.....');
@@ -82,11 +82,9 @@ class ParkingRepository extends SetMain {
       getBackToMainPage('Finns ingen parkering med det angivna id');
     }
 
-    final parkingToDelete = parkingList[foundParkingIndex];
-
-    parkingList.removeAt(foundParkingIndex);
+    final removedParking = parkingList.removeAt(foundParkingIndex);
 
     print(
-        'Du har raderat följande parkering: ${parkingToDelete.id} - ${parkingToDelete.startTime}-${parkingToDelete.endTime}');
+        'Du har raderat följande parkering: ${removedParking.id} - ${removedParking.startTime}-${removedParking.endTime}');
   }
 }

@@ -21,7 +21,7 @@ class ParkingSpaceRepository extends SetMain {
     if (parkingSpaceList.isNotEmpty) {
       for (var (index, parkingSpace) in parkingSpaceList.indexed) {
         print(
-            '${index + 1}. Id: ${parkingSpace.id}, Adress: ${parkingSpace.address} Pris per timme: ${parkingSpace.pricePerHour}');
+            '${index + 1}. Id: ${parkingSpace.id}\n Adress: ${parkingSpace.address}\n Pris per timme: ${parkingSpace.pricePerHour}\n');
       }
     } else {
       print('Inga parkeringsplatser att visa för tillfället....');

@@ -26,7 +26,7 @@ class VehicleRepository extends SetMain {
     if (vehicleList.isNotEmpty) {
       for (var (index, vehicle) in vehicleList.indexed) {
         print(
-            '${index + 1}. RegNr: ${vehicle.regNr}, Ägare: ${vehicle.owner.name}-${vehicle.owner.socialSecurityNumber} Typ: ${vehicle.vehicleType.name}');
+            '${index + 1}. Id: ${vehicle.id}\n RegNr: ${vehicle.regNr}\n Ägare: ${vehicle.owner.name}-${vehicle.owner.socialSecurityNumber}\n Typ: ${vehicle.vehicleType.name}\n');
       }
     } else {
       print('Finns inga fordon att visa just nu....');
