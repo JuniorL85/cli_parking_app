@@ -84,12 +84,13 @@ class ParkingLogic extends SetMain {
       return;
     }
 
+    final formattedEndTimeInput =
+        DateTime.tryParse(_getCorrectDate(endTimeInput));
+
     parkingRepository.addParking(
       regNrInput,
       parkingPlaceIdInput,
-      DateTime.tryParse(
-        _getCorrectDate(endTimeInput),
-      )!,
+      formattedEndTimeInput!,
     );
     parkingRepository.getAllParkings();
 
@@ -135,8 +136,10 @@ class ParkingLogic extends SetMain {
       print('Du gjorde ingen ändring!');
     } else {
       endTime = endTimeInput;
-      parkingRepository.updateParkings(
-          parkingIdInput, DateTime.tryParse(_getCorrectDate(endTime))!);
+
+      final formattedEndTimeInput = DateTime.tryParse(_getCorrectDate(endTime));
+
+      parkingRepository.updateParkings(parkingIdInput, formattedEndTimeInput!);
     }
 
     print('\nFöljande parkeringar är kvar i listan\n');

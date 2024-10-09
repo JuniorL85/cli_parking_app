@@ -14,6 +14,12 @@ class ParkingRepository extends SetMain {
 
   List<Parking> parkingList = [];
 
+  void _calculateDuration(startTime, endTime, pricePerHour) {
+    Duration interval = endTime.difference(startTime);
+    final price = interval.inMinutes / 60 * pricePerHour;
+    print('\nDitt pris kommer att bli: ${price.toStringAsFixed(2)}kr\n');
+  }
+
   void addParking(String regNr, String parkingPlaceId, DateTime endTime) {
     try {
       final addVehicle = vehicleRepository.vehicleList
@@ -32,6 +38,8 @@ class ParkingRepository extends SetMain {
       );
 
       parkingList.add(addParking);
+
+      _calculateDuration(DateTime.now(), endTime, addParkingSpace.pricePerHour);
     } catch (err) {
       getBackToMainPage(
           'Det gick fel, du omdirigeras till startsidan, se till att du lagt till personer, fordon och parkeringsplatser innan du forsätter!');
@@ -56,7 +64,15 @@ class ParkingRepository extends SetMain {
       getBackToMainPage('Finns ingen parkering med det angivna id');
     }
 
-    parkingList[foundParkingIndex].endTime = endTime;
+    final foundParking = parkingList[foundParkingIndex];
+
+    foundParking.endTime = endTime;
+
+    _calculateDuration(
+      foundParking.startTime,
+      foundParking.endTime,
+      foundParking.parkingSpace.pricePerHour,
+    );
   }
 
   void deleteParkings(String parkingId) {
