@@ -95,6 +95,8 @@ class ParkingSpaceLogic extends SetMain {
       getBackToMainPage(
           'Finns inga parkeringsplatser att uppdatera, testa att lägga till en parkeringsplats först');
     }
+    parkingSpaceRepository.getAllParkingSpaces();
+
     stdout.write('Fyll i id för parkeringsplatsen du vill uppdatera: ');
     var parkingPlaceIdInput = stdin.readLineSync();
 
@@ -155,6 +157,7 @@ class ParkingSpaceLogic extends SetMain {
       getBackToMainPage(
           'Finns inga parkeringsplatser att radera, testa att lägga till en parkeringsplats först');
     }
+    parkingSpaceRepository.getAllParkingSpaces();
 
     stdout.write('Fyll i id för parkeringsplatsen: ');
     var parkingPlaceIdInput = stdin.readLineSync();

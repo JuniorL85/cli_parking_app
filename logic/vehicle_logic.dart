@@ -147,6 +147,9 @@ class VehicleLogic extends SetMain {
       getBackToMainPage(
           'Finns inga fordon att uppdatera, testa att lägga till ett fordon först');
     }
+
+    vehicleRepository.getAllVehicles();
+
     stdout.write('Fyll i registreringsnummer på fordonet du vill uppdatera: ');
     var regNrInput = stdin.readLineSync()!.toUpperCase();
 
@@ -204,6 +207,9 @@ class VehicleLogic extends SetMain {
       getBackToMainPage(
           'Finns inga fordon att radera, testa att lägga till ett fordon först');
     }
+
+    vehicleRepository.getAllVehicles();
+
     stdout.write('Fyll i registreringsnummer: ');
     var regNrInput = stdin.readLineSync();
 

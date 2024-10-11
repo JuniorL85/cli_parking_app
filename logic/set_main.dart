@@ -21,48 +21,73 @@ class SetMain {
     int pickedMenuOption;
     stdout.writeAll(firstPageTexts);
     final input = stdin.readLineSync();
-    int pickedOption = int.parse(input!);
 
-    switch (pickedOption) {
-      case 1:
-        stdout.writeAll(PersonLogic().texts);
-        final personInput = stdin.readLineSync();
-        pickedMenuOption = int.parse(personInput!);
+    if (input == null || input.isEmpty) {
+      print('Du har inte valt något giltigt alternativ');
+      return;
+    } else {
+      int pickedOption = int.parse(input);
 
-        final PersonLogic personLogic = new PersonLogic();
-        personLogic.runLogic(pickedMenuOption);
-        break;
-      case 2:
-        stdout.writeAll(VehicleLogic().texts);
-        final vehicleInput = stdin.readLineSync();
-        pickedMenuOption = int.parse(vehicleInput!);
+      switch (pickedOption) {
+        case 1:
+          stdout.writeAll(PersonLogic().texts);
+          final personInput = stdin.readLineSync();
+          if (personInput == null || personInput.isEmpty) {
+            print('Du har inte valt något giltigt alternativ');
+            return;
+          }
+          pickedMenuOption = int.parse(personInput);
 
-        final VehicleLogic vehicleLogic = new VehicleLogic();
-        vehicleLogic.runLogic(pickedMenuOption);
-        break;
-      case 3:
-        stdout.writeAll(ParkingSpaceLogic().texts);
-        final parkingSpaceInput = stdin.readLineSync();
-        pickedMenuOption = int.parse(parkingSpaceInput!);
+          final PersonLogic personLogic = new PersonLogic();
+          personLogic.runLogic(pickedMenuOption);
+          break;
+        case 2:
+          stdout.writeAll(VehicleLogic().texts);
+          final vehicleInput = stdin.readLineSync();
 
-        final ParkingSpaceLogic vehicleLogic = new ParkingSpaceLogic();
-        vehicleLogic.runLogic(pickedMenuOption);
-        break;
-      case 4:
-        stdout.writeAll(ParkingLogic().texts);
-        final parkingInput = stdin.readLineSync();
-        pickedMenuOption = int.parse(parkingInput!);
+          if (vehicleInput == null || vehicleInput.isEmpty) {
+            print('Du har inte valt något giltigt alternativ');
+            return;
+          }
+          pickedMenuOption = int.parse(vehicleInput);
 
-        final ParkingLogic vehicleLogic = new ParkingLogic();
-        vehicleLogic.runLogic(pickedMenuOption);
-        break;
-      case 5:
-        stdout.write(
-            'Du valde att avsluta, tack för att du använde Parkeringsappen!');
-        return;
-      default:
-        print('Ogiltigt val');
-        return;
+          final VehicleLogic vehicleLogic = new VehicleLogic();
+          vehicleLogic.runLogic(pickedMenuOption);
+          break;
+        case 3:
+          stdout.writeAll(ParkingSpaceLogic().texts);
+          final parkingSpaceInput = stdin.readLineSync();
+
+          if (parkingSpaceInput == null || parkingSpaceInput.isEmpty) {
+            print('Du har inte valt något giltigt alternativ');
+            return;
+          }
+          pickedMenuOption = int.parse(parkingSpaceInput);
+
+          final ParkingSpaceLogic vehicleLogic = new ParkingSpaceLogic();
+          vehicleLogic.runLogic(pickedMenuOption);
+          break;
+        case 4:
+          stdout.writeAll(ParkingLogic().texts);
+          final parkingInput = stdin.readLineSync();
+
+          if (parkingInput == null || parkingInput.isEmpty) {
+            print('Du har inte valt något giltigt alternativ');
+            return;
+          }
+          pickedMenuOption = int.parse(parkingInput);
+
+          final ParkingLogic vehicleLogic = new ParkingLogic();
+          vehicleLogic.runLogic(pickedMenuOption);
+          break;
+        case 5:
+          stdout.write(
+              'Du valde att avsluta, tack för att du använde Parkeringsappen!');
+          return;
+        default:
+          print('Ogiltigt val');
+          return;
+      }
     }
   }
 

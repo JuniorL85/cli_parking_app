@@ -48,9 +48,24 @@ class ParkingRepository extends SetMain {
 
   void getAllParkings() {
     if (parkingList.isNotEmpty) {
-      for (var (index, park) in parkingList.indexed) {
-        print(
-            '${index + 1}. Id: ${park.id}\n Parkering: ${park.parkingSpace.address}\n Time (start and end): ${park.startTime}-${park.endTime}\n RegNr: ${park.vehicle.regNr}\n');
+      // finns det några aktiva i listan och tiden har gått ut så tas dessa bort
+      final foundActiveParkingIndex = parkingList.indexWhere(
+        (activeParking) => (activeParking.endTime.microsecondsSinceEpoch <
+            DateTime.now().microsecondsSinceEpoch),
+      );
+
+      if (foundActiveParkingIndex != -1) {
+        final foundActiveParking = parkingList[foundActiveParkingIndex];
+        deleteParkings(foundActiveParking.id, isFromGetAllParkings: true);
+      }
+
+      if (parkingList.length > 0) {
+        for (var (index, park) in parkingList.indexed) {
+          print(
+              '${index + 1}. Id: ${park.id}\n Parkering: ${park.parkingSpace.address}\n Time (start and end): ${park.startTime}-${park.endTime}\n RegNr: ${park.vehicle.regNr}\n');
+        }
+      } else {
+        getBackToMainPage('');
       }
     } else {
       print('Inga parkeringar att visa för tillfället.....');
@@ -75,7 +90,7 @@ class ParkingRepository extends SetMain {
     );
   }
 
-  void deleteParkings(String parkingId) {
+  void deleteParkings(String parkingId, {bool isFromGetAllParkings = false}) {
     final foundParkingIndex = parkingList.indexWhere((v) => v.id == parkingId);
 
     if (foundParkingIndex == -1) {
@@ -84,7 +99,9 @@ class ParkingRepository extends SetMain {
 
     final removedParking = parkingList.removeAt(foundParkingIndex);
 
-    print(
-        'Du har raderat följande parkering: ${removedParking.id} - ${removedParking.startTime}-${removedParking.endTime}');
+    if (!isFromGetAllParkings) {
+      print(
+          'Du har raderat följande parkering: ${removedParking.id} - ${removedParking.startTime}-${removedParking.endTime}');
+    }
   }
 }

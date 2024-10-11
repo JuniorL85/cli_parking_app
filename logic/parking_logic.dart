@@ -1,10 +1,13 @@
 import 'dart:io';
 
 import '../repositories/parking_repo.dart';
+import '../repositories/parking_space_repo.dart';
 import 'set_main.dart';
 
 class ParkingLogic extends SetMain {
   final ParkingRepository parkingRepository = ParkingRepository.instance;
+  final ParkingSpaceRepository parkingSpaceRepository =
+      ParkingSpaceRepository.instance;
 
   List<String> texts = [
     'Du har valt att hantera Parkeringar. Vad vill du göra?\n',
@@ -56,47 +59,63 @@ class ParkingLogic extends SetMain {
       regNrInput = stdin.readLineSync();
     }
 
-    stdout.write('Fyll i id för parkeringsplatsen: ');
-    var parkingPlaceIdInput = stdin.readLineSync();
-
-    if (parkingPlaceIdInput == null || parkingPlaceIdInput.isEmpty) {
-      stdout.write(
-          'Du har inte fyllt i något id för parkeringsplatsen, vänligen fyll i ett id för parkeringsplatsen: ');
-      parkingPlaceIdInput = stdin.readLineSync();
-    }
-
-    stdout.write('Fyll i sluttid för din parkering (hh:mm): ');
-    var endTimeInput = stdin.readLineSync();
-
-    if (endTimeInput == null || endTimeInput.isEmpty) {
-      stdout.write(
-          'Du har inte fyllt i någon sluttid för din parkering, vänligen fyll i en sluttid för din parkering: ');
-      endTimeInput = stdin.readLineSync();
-    }
-
-    if (parkingPlaceIdInput == null ||
-        parkingPlaceIdInput.isEmpty ||
-        endTimeInput == null ||
-        endTimeInput.isEmpty ||
-        regNrInput == null ||
-        regNrInput.isEmpty) {
-      setMainPage();
-      return;
-    }
-
-    final formattedEndTimeInput =
-        DateTime.tryParse(_getCorrectDate(endTimeInput));
-
-    parkingRepository.addParking(
-      regNrInput,
-      parkingPlaceIdInput,
-      formattedEndTimeInput!,
+    final foundActiveParking = parkingRepository.parkingList.indexWhere(
+      (activeParking) => (activeParking.vehicle.regNr == regNrInput &&
+          activeParking.endTime.microsecondsSinceEpoch >
+              DateTime.now().microsecondsSinceEpoch),
     );
-    parkingRepository.getAllParkings();
 
-    stdout.write('Tryck på något för att komma till huvudmenyn');
-    stdin.readLineSync();
-    setMainPage();
+    if (foundActiveParking != -1) {
+      getBackToMainPage(
+          'Det finns redan en aktiv parkering på angivet regnr testa att uppdatera den istället, du skickas tillbaka till huvudsidan');
+      return;
+    } else {
+      if (regNrInput != null) {
+        parkingSpaceRepository.getAllParkingSpaces();
+      }
+
+      stdout.write('Fyll i id för parkeringsplatsen: ');
+      var parkingPlaceIdInput = stdin.readLineSync();
+
+      if (parkingPlaceIdInput == null || parkingPlaceIdInput.isEmpty) {
+        stdout.write(
+            'Du har inte fyllt i något id för parkeringsplatsen, vänligen fyll i ett id för parkeringsplatsen: ');
+        parkingPlaceIdInput = stdin.readLineSync();
+      }
+
+      stdout.write('Fyll i sluttid för din parkering (hh:mm): ');
+      var endTimeInput = stdin.readLineSync();
+
+      if (endTimeInput == null || endTimeInput.isEmpty) {
+        stdout.write(
+            'Du har inte fyllt i någon sluttid för din parkering, vänligen fyll i en sluttid för din parkering: ');
+        endTimeInput = stdin.readLineSync();
+      }
+
+      if (parkingPlaceIdInput == null ||
+          parkingPlaceIdInput.isEmpty ||
+          endTimeInput == null ||
+          endTimeInput.isEmpty ||
+          regNrInput == null ||
+          regNrInput.isEmpty) {
+        setMainPage();
+        return;
+      }
+
+      final formattedEndTimeInput =
+          DateTime.tryParse(_getCorrectDate(endTimeInput));
+
+      parkingRepository.addParking(
+        regNrInput,
+        parkingPlaceIdInput,
+        formattedEndTimeInput!,
+      );
+      parkingRepository.getAllParkings();
+
+      stdout.write('Tryck på något för att komma till huvudmenyn');
+      stdin.readLineSync();
+      setMainPage();
+    }
   }
 
   void _showAllParkingsLogic() {
@@ -113,6 +132,9 @@ class ParkingLogic extends SetMain {
       getBackToMainPage(
           'Finns inga parkeringar att uppdatera, testa att lägga till en parkering först');
     }
+
+    parkingRepository.getAllParkings();
+
     stdout
         .write('Fyll i id för parkeringen på parkeringen du vill uppdatera: ');
     var parkingIdInput = stdin.readLineSync();
@@ -156,6 +178,9 @@ class ParkingLogic extends SetMain {
       getBackToMainPage(
           'Finns inga parkeringar att radera, testa att lägga till en parkering först');
     }
+
+    parkingRepository.getAllParkings();
+
     stdout.write('Fyll i id för parkeringen: ');
     var parkingIdInput = stdin.readLineSync();
 
