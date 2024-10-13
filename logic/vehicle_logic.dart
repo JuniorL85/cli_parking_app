@@ -82,6 +82,11 @@ class VehicleLogic extends SetMain {
         regNrInput = stdin.readLineSync();
       }
 
+      if (regNrInput == null || regNrInput.isEmpty) {
+        setMainPage();
+        return;
+      }
+
       stdout.write(
           'Fyll i vilken typ av fordon det är med en siffra (1: Bil, 2: Motorcykel, 3: Annat): ');
       var typeInput = stdin.readLineSync();
@@ -93,10 +98,7 @@ class VehicleLogic extends SetMain {
       }
 
       // Dubbelkollar så inga tomma värden skickas
-      if (typeInput == null ||
-          typeInput.isEmpty ||
-          regNrInput == null ||
-          regNrInput.isEmpty) {
+      if (typeInput == null || typeInput.isEmpty) {
         setMainPage();
         return;
       }
@@ -127,7 +129,7 @@ class VehicleLogic extends SetMain {
       stdin.readLineSync();
       setMainPage();
     } catch (error) {
-      stdout.write('Felaktigt personnummer du omdirigeras till huvudmenyn');
+      stdout.write('Felaktigt personnummer du omdirigeras till huvudmenyn\n');
       setMainPage();
       return;
     }
@@ -165,40 +167,47 @@ class VehicleLogic extends SetMain {
       return;
     }
 
-    final vehicleOwnerInfo = vehicleRepository.vehicleList
-        .where((p) => p.regNr == regNrInput)
-        .map((v) => Person(
-            name: v.owner.name,
-            socialSecurityNumber: v.owner.socialSecurityNumber))
-        .first;
+    final foundVehicleIndex =
+        vehicleRepository.vehicleList.indexWhere((p) => p.regNr == regNrInput);
 
-    VehicleType vehicleType = vehicleRepository.vehicleList
-        .firstWhere((v) => v.regNr == regNrInput)
-        .vehicleType;
+    if (foundVehicleIndex != -1) {
+      final vehicleOwnerInfo = vehicleRepository.vehicleList
+          .where((p) => p.regNr == regNrInput)
+          .map((v) => Person(
+              name: v.owner.name,
+              socialSecurityNumber: v.owner.socialSecurityNumber))
+          .first;
 
-    print('Vänligen fyll i det nya registreringsnumret på fordonet: ');
-    var regnr = stdin.readLineSync()!.toUpperCase();
-    var updatedRegnr;
-    if (regnr.isEmpty) {
-      updatedRegnr = '';
-      print('Du gjorde ingen ändring!');
+      VehicleType vehicleType = vehicleRepository.vehicleList
+          .firstWhere((v) => v.regNr == regNrInput)
+          .vehicleType;
+
+      print('Vänligen fyll i det nya registreringsnumret på fordonet: ');
+      var regnr = stdin.readLineSync()!.toUpperCase();
+      var updatedRegnr;
+      if (regnr.isEmpty) {
+        updatedRegnr = '';
+        print('Du gjorde ingen ändring!');
+      } else {
+        updatedRegnr = regnr;
+        vehicleRepository.updateVehicles(
+            Vehicle(
+              regNr: updatedRegnr,
+              vehicleType: vehicleType,
+              owner: vehicleOwnerInfo,
+            ),
+            regNrInput);
+      }
+
+      print('\nFöljande fordon är kvar i listan\n');
+      vehicleRepository.getAllVehicles();
+
+      stdout.write('Tryck på något för att komma till huvudmenyn');
+      stdin.readLineSync();
+      setMainPage();
     } else {
-      updatedRegnr = regnr;
-      vehicleRepository.updateVehicles(
-          Vehicle(
-            regNr: updatedRegnr,
-            vehicleType: vehicleType,
-            owner: vehicleOwnerInfo,
-          ),
-          regNrInput);
+      getBackToMainPage('Du har angett ett felaktigt registreringsnummer');
     }
-
-    print('\nFöljande fordon är kvar i listan\n');
-    vehicleRepository.getAllVehicles();
-
-    stdout.write('Tryck på något för att komma till huvudmenyn');
-    stdin.readLineSync();
-    setMainPage();
   }
 
   void _deleteVehicleLogic() {
@@ -225,12 +234,19 @@ class VehicleLogic extends SetMain {
       return;
     }
 
-    vehicleRepository.deleteVehicle(regNrInput.toUpperCase());
-    print('\nFöljande fordon är kvar i listan\n');
-    vehicleRepository.getAllVehicles();
+    final foundVehicleIndex =
+        vehicleRepository.vehicleList.indexWhere((p) => p.regNr == regNrInput);
 
-    stdout.write('Tryck på något för att komma till huvudmenyn');
-    stdin.readLineSync();
-    setMainPage();
+    if (foundVehicleIndex != -1) {
+      vehicleRepository.deleteVehicle(regNrInput.toUpperCase());
+      print('\nFöljande fordon är kvar i listan\n');
+      vehicleRepository.getAllVehicles();
+
+      stdout.write('Tryck på något för att komma till huvudmenyn');
+      stdin.readLineSync();
+      setMainPage();
+    } else {
+      getBackToMainPage('Du har angett ett felaktigt registreringsnummer');
+    }
   }
 }

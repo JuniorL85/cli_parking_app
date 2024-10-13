@@ -52,6 +52,11 @@ class ParkingSpaceLogic extends SetMain {
       addressInput = stdin.readLineSync();
     }
 
+    if (addressInput == null || addressInput.isEmpty) {
+      setMainPage();
+      return;
+    }
+
     stdout.write('Fyll i pris per timme för parkeringsplatsen: ');
     var pricePerHourInput = stdin.readLineSync();
 
@@ -62,10 +67,7 @@ class ParkingSpaceLogic extends SetMain {
     }
 
     // Dubbelkollar så inga tomma värden skickas
-    if (addressInput == null ||
-        addressInput.isEmpty ||
-        pricePerHourInput == null ||
-        pricePerHourInput.isEmpty) {
+    if (pricePerHourInput == null || pricePerHourInput.isEmpty) {
       setMainPage();
       return;
     }
@@ -111,44 +113,51 @@ class ParkingSpaceLogic extends SetMain {
       return;
     }
 
-    ParkingSpace oldParkingSpace = parkingSpaceRepository.parkingSpaceList
-        .where((parkingSpace) => parkingSpace.id == parkingPlaceIdInput)
-        .first;
+    final foundParkingSpaceIdIndex = parkingSpaceRepository.parkingSpaceList
+        .indexWhere((i) => i.id == parkingPlaceIdInput);
 
-    print('Vill du uppdatera parkeringsplatsens adress? Annars tryck Enter: ');
-    var addressInput = stdin.readLineSync();
-    var updatedAddress;
-    if (addressInput == null || addressInput.isEmpty) {
-      updatedAddress = oldParkingSpace.address;
-      print('Du gjorde ingen ändring!');
+    if (foundParkingSpaceIdIndex != -1) {
+      ParkingSpace oldParkingSpace =
+          parkingSpaceRepository.parkingSpaceList[foundParkingSpaceIdIndex];
+
+      print(
+          'Vill du uppdatera parkeringsplatsens adress? Annars tryck Enter: ');
+      var addressInput = stdin.readLineSync();
+      var updatedAddress;
+      if (addressInput == null || addressInput.isEmpty) {
+        updatedAddress = oldParkingSpace.address;
+        print('Du gjorde ingen ändring!');
+      } else {
+        updatedAddress = addressInput;
+        print('Du har ändrat adressen till $updatedAddress!');
+      }
+
+      print(
+          'Vill du uppdatera parkeringsplatsens pris per timme? Annars tryck Enter: ');
+      var pphInput = stdin.readLineSync();
+      int updatedPph;
+      if (pphInput == null || pphInput.isEmpty) {
+        updatedPph = oldParkingSpace.pricePerHour;
+        print('Du gjorde ingen ändring!');
+      } else {
+        updatedPph = int.parse(pphInput);
+        print('Du har ändrat pris per timme till $updatedPph!');
+      }
+
+      parkingSpaceRepository.updateParkingSpace(ParkingSpace(
+          id: parkingPlaceIdInput,
+          address: updatedAddress,
+          pricePerHour: updatedPph));
+
+      print('\nFöljande parkeringsplatser är kvar i listan\n');
+      parkingSpaceRepository.getAllParkingSpaces();
+
+      stdout.write('Tryck på något för att komma till huvudmenyn');
+      stdin.readLineSync();
+      setMainPage();
     } else {
-      updatedAddress = addressInput;
-      print('Du har ändrat adressen till $updatedAddress!');
+      getBackToMainPage('Du angav ett felaktigt id');
     }
-
-    print(
-        'Vill du uppdatera parkeringsplatsens pris per timme? Annars tryck Enter: ');
-    var pphInput = stdin.readLineSync();
-    int updatedPph;
-    if (pphInput == null || pphInput.isEmpty) {
-      updatedPph = oldParkingSpace.pricePerHour;
-      print('Du gjorde ingen ändring!');
-    } else {
-      updatedPph = int.parse(pphInput);
-      print('Du har ändrat pris per timme till $updatedPph!');
-    }
-
-    parkingSpaceRepository.updateParkingSpace(ParkingSpace(
-        id: parkingPlaceIdInput,
-        address: updatedAddress,
-        pricePerHour: updatedPph));
-
-    print('\nFöljande parkeringsplatser är kvar i listan\n');
-    parkingSpaceRepository.getAllParkingSpaces();
-
-    stdout.write('Tryck på något för att komma till huvudmenyn');
-    stdin.readLineSync();
-    setMainPage();
   }
 
   void _deleteParkingSpaceLogic() {
@@ -173,12 +182,19 @@ class ParkingSpaceLogic extends SetMain {
       return;
     }
 
-    parkingSpaceRepository.deleteParkingSpace(parkingPlaceIdInput);
-    print('\nFöljande parkeringsplatser är kvar i listan\n');
-    parkingSpaceRepository.getAllParkingSpaces();
+    final foundParkingSpaceIdIndex = parkingSpaceRepository.parkingSpaceList
+        .indexWhere((i) => i.id == parkingPlaceIdInput);
 
-    stdout.write('Tryck på något för att komma till huvudmenyn');
-    stdin.readLineSync();
-    setMainPage();
+    if (foundParkingSpaceIdIndex != -1) {
+      parkingSpaceRepository.deleteParkingSpace(parkingPlaceIdInput);
+      print('\nFöljande parkeringsplatser är kvar i listan\n');
+      parkingSpaceRepository.getAllParkingSpaces();
+
+      stdout.write('Tryck på något för att komma till huvudmenyn');
+      stdin.readLineSync();
+      setMainPage();
+    } else {
+      getBackToMainPage('Du angav ett felaktigt id');
+    }
   }
 }

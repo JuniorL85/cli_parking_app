@@ -23,7 +23,8 @@ class ParkingRepository extends SetMain {
   void addParking(String regNr, String parkingPlaceId, DateTime endTime) {
     try {
       final addVehicle = vehicleRepository.vehicleList
-          .where((vehicle) => vehicle.regNr == regNr)
+          .where(
+              (vehicle) => vehicle.regNr.toUpperCase() == regNr.toUpperCase())
           .first;
 
       final addParkingSpace = parkingSpaceRepository.parkingSpaceList
@@ -38,9 +39,10 @@ class ParkingRepository extends SetMain {
       );
 
       parkingList.add(addParking);
-
+      print(endTime);
       _calculateDuration(DateTime.now(), endTime, addParkingSpace.pricePerHour);
     } catch (err) {
+      print(err);
       getBackToMainPage(
           'Det gick fel, du omdirigeras till startsidan, se till att du lagt till personer, fordon och parkeringsplatser innan du forsätter!');
     }

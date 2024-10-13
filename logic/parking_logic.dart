@@ -2,12 +2,14 @@ import 'dart:io';
 
 import '../repositories/parking_repo.dart';
 import '../repositories/parking_space_repo.dart';
+import '../repositories/vehicle_repo.dart';
 import 'set_main.dart';
 
 class ParkingLogic extends SetMain {
   final ParkingRepository parkingRepository = ParkingRepository.instance;
   final ParkingSpaceRepository parkingSpaceRepository =
       ParkingSpaceRepository.instance;
+  final VehicleRepository vehicleRepository = VehicleRepository.instance;
 
   List<String> texts = [
     'Du har valt att hantera Parkeringar. Vad vill du göra?\n',
@@ -59,8 +61,14 @@ class ParkingLogic extends SetMain {
       regNrInput = stdin.readLineSync();
     }
 
+    if (regNrInput == null || regNrInput.isEmpty) {
+      setMainPage();
+      return;
+    }
+
     final foundActiveParking = parkingRepository.parkingList.indexWhere(
-      (activeParking) => (activeParking.vehicle.regNr == regNrInput &&
+      (activeParking) => (activeParking.vehicle.regNr.toUpperCase() ==
+              regNrInput!.toUpperCase() &&
           activeParking.endTime.microsecondsSinceEpoch >
               DateTime.now().microsecondsSinceEpoch),
     );
@@ -70,51 +78,72 @@ class ParkingLogic extends SetMain {
           'Det finns redan en aktiv parkering på angivet regnr testa att uppdatera den istället, du skickas tillbaka till huvudsidan');
       return;
     } else {
-      if (regNrInput != null) {
+      final foundMatchingRegNr = vehicleRepository.vehicleList.indexWhere(
+          (vehicle) =>
+              (vehicle.regNr.toUpperCase() == regNrInput!.toUpperCase()));
+
+      if (foundMatchingRegNr != -1) {
+        print('Valbara parkeringsplatser\n');
         parkingSpaceRepository.getAllParkingSpaces();
+
+        stdout.write('Fyll i id för parkeringsplatsen: ');
+        var parkingPlaceIdInput = stdin.readLineSync();
+
+        if (parkingPlaceIdInput == null || parkingPlaceIdInput.isEmpty) {
+          stdout.write(
+              'Du har inte fyllt i något id för parkeringsplatsen, vänligen fyll i ett id för parkeringsplatsen: ');
+          parkingPlaceIdInput = stdin.readLineSync();
+        }
+
+        if (parkingPlaceIdInput == null || parkingPlaceIdInput.isEmpty) {
+          setMainPage();
+          return;
+        }
+
+        final parkingSpaceIndexId = parkingSpaceRepository.parkingSpaceList
+            .indexWhere((i) => i.id == parkingPlaceIdInput);
+
+        if (parkingSpaceIndexId != -1) {
+          stdout.write(
+              'Fyll i sluttid för din parkering i korrekt format -> (hh:mm): ');
+          var endTimeInput = stdin.readLineSync();
+
+          if (endTimeInput == null || endTimeInput.isEmpty) {
+            stdout.write(
+                'Du har inte fyllt i någon sluttid för din parkering, vänligen fyll i en sluttid för din parkering: ');
+            endTimeInput = stdin.readLineSync();
+          }
+
+          if (endTimeInput == null || endTimeInput.isEmpty) {
+            setMainPage();
+            return;
+          }
+
+          final formattedEndTimeInput =
+              DateTime.tryParse(_getCorrectDate(endTimeInput));
+
+          if (formattedEndTimeInput == null) {
+            print('Du angav ett felaktigt tidsformat');
+            setMainPage();
+            return;
+          }
+
+          parkingRepository.addParking(
+            regNrInput.toUpperCase(),
+            parkingPlaceIdInput,
+            formattedEndTimeInput,
+          );
+          parkingRepository.getAllParkings();
+
+          stdout.write('Tryck på något för att komma till huvudmenyn');
+          stdin.readLineSync();
+          setMainPage();
+        } else {
+          getBackToMainPage('Finns ingen parkeringsplats med angivet id');
+        }
+      } else {
+        getBackToMainPage('Finns inget matchande registreringsnummer');
       }
-
-      stdout.write('Fyll i id för parkeringsplatsen: ');
-      var parkingPlaceIdInput = stdin.readLineSync();
-
-      if (parkingPlaceIdInput == null || parkingPlaceIdInput.isEmpty) {
-        stdout.write(
-            'Du har inte fyllt i något id för parkeringsplatsen, vänligen fyll i ett id för parkeringsplatsen: ');
-        parkingPlaceIdInput = stdin.readLineSync();
-      }
-
-      stdout.write('Fyll i sluttid för din parkering (hh:mm): ');
-      var endTimeInput = stdin.readLineSync();
-
-      if (endTimeInput == null || endTimeInput.isEmpty) {
-        stdout.write(
-            'Du har inte fyllt i någon sluttid för din parkering, vänligen fyll i en sluttid för din parkering: ');
-        endTimeInput = stdin.readLineSync();
-      }
-
-      if (parkingPlaceIdInput == null ||
-          parkingPlaceIdInput.isEmpty ||
-          endTimeInput == null ||
-          endTimeInput.isEmpty ||
-          regNrInput == null ||
-          regNrInput.isEmpty) {
-        setMainPage();
-        return;
-      }
-
-      final formattedEndTimeInput =
-          DateTime.tryParse(_getCorrectDate(endTimeInput));
-
-      parkingRepository.addParking(
-        regNrInput,
-        parkingPlaceIdInput,
-        formattedEndTimeInput!,
-      );
-      parkingRepository.getAllParkings();
-
-      stdout.write('Tryck på något för att komma till huvudmenyn');
-      stdin.readLineSync();
-      setMainPage();
     }
   }
 
@@ -150,26 +179,40 @@ class ParkingLogic extends SetMain {
       return;
     }
 
-    print('Vill du uppdatera parkeringens sluttid? Annars tryck Enter: ');
-    var endTimeInput = stdin.readLineSync();
-    var endTime;
-    if (endTimeInput == null || endTimeInput.isEmpty) {
-      endTime = '';
-      print('Du gjorde ingen ändring!');
+    final foundParkingIndexId = parkingRepository.parkingList
+        .indexWhere((i) => (i.id == parkingIdInput));
+
+    if (foundParkingIndexId != -1) {
+      print('Vill du uppdatera parkeringens sluttid? Annars tryck Enter: ');
+      var endTimeInput = stdin.readLineSync();
+      var endTime;
+      if (endTimeInput == null || endTimeInput.isEmpty) {
+        endTime = '';
+        print('Du gjorde ingen ändring!');
+      } else {
+        endTime = endTimeInput;
+
+        final formattedEndTimeInput =
+            DateTime.tryParse(_getCorrectDate(endTime));
+
+        if (formattedEndTimeInput == null) {
+          print('Du angav ett felaktigt tidsformat');
+          setMainPage();
+          return;
+        }
+
+        parkingRepository.updateParkings(parkingIdInput, formattedEndTimeInput);
+      }
+
+      print('\nFöljande parkeringar är kvar i listan\n');
+      parkingRepository.getAllParkings();
+
+      stdout.write('Tryck på något för att komma till huvudmenyn');
+      stdin.readLineSync();
+      setMainPage();
     } else {
-      endTime = endTimeInput;
-
-      final formattedEndTimeInput = DateTime.tryParse(_getCorrectDate(endTime));
-
-      parkingRepository.updateParkings(parkingIdInput, formattedEndTimeInput!);
+      getBackToMainPage('Finns ingen aktiv parkering med angivet id');
     }
-
-    print('\nFöljande parkeringar är kvar i listan\n');
-    parkingRepository.getAllParkings();
-
-    stdout.write('Tryck på något för att komma till huvudmenyn');
-    stdin.readLineSync();
-    setMainPage();
   }
 
   void _deleteParkingLogic() {
@@ -195,12 +238,19 @@ class ParkingLogic extends SetMain {
       return;
     }
 
-    parkingRepository.deleteParkings(parkingIdInput);
-    print('\nFöljande parkeringar är kvar i listan\n');
-    parkingRepository.getAllParkings();
+    final foundParkingIndexId = parkingRepository.parkingList
+        .indexWhere((i) => (i.id == parkingIdInput));
 
-    stdout.write('Tryck på något för att komma till huvudmenyn');
-    stdin.readLineSync();
-    setMainPage();
+    if (foundParkingIndexId != -1) {
+      parkingRepository.deleteParkings(parkingIdInput);
+      print('\nFöljande parkeringar är kvar i listan\n');
+      parkingRepository.getAllParkings();
+
+      stdout.write('Tryck på något för att komma till huvudmenyn');
+      stdin.readLineSync();
+      setMainPage();
+    } else {
+      getBackToMainPage('Finns ingen aktiv parkering med angivet id');
+    }
   }
 }

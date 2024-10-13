@@ -1,6 +1,5 @@
 import '../logic/set_main.dart';
 import '../models/person.dart';
-import '../models/vehicle.dart';
 import 'vehicle_repo.dart';
 
 class PersonRepository extends SetMain {
@@ -47,13 +46,17 @@ class PersonRepository extends SetMain {
     final personToDelete = personList.firstWhere(
         (person) => person.socialSecurityNumber == socialSecurityNumber);
 
-    final Vehicle personToDeleteInVehicleList = vehicleRepository.vehicleList
-        .firstWhere((v) =>
+    final personToDeleteInVehicleListIndex = vehicleRepository.vehicleList
+        .indexWhere((v) =>
             v.owner.socialSecurityNumber ==
             personToDelete.socialSecurityNumber);
 
     personList.remove(personToDelete);
-    vehicleRepository.vehicleList.remove(personToDeleteInVehicleList);
+
+    if (personToDeleteInVehicleListIndex != -1) {
+      vehicleRepository.vehicleList.removeAt(personToDeleteInVehicleListIndex);
+    }
+
     print(
         'Du har raderat följande person: ${personToDelete.name} - ${personToDelete.socialSecurityNumber}');
   }
