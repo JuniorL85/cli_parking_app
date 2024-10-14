@@ -1,3 +1,5 @@
+import 'package:collection/src/iterable_extensions.dart';
+
 import '../logic/set_main.dart';
 import '../models/person.dart';
 import 'vehicle_repo.dart';
@@ -43,21 +45,26 @@ class PersonRepository extends SetMain {
   }
 
   void deletePerson(String socialSecurityNumber) {
-    final personToDelete = personList.firstWhere(
+    final personToDelete = personList.firstWhereOrNull(
         (person) => person.socialSecurityNumber == socialSecurityNumber);
 
-    final personToDeleteInVehicleListIndex = vehicleRepository.vehicleList
-        .indexWhere((v) =>
-            v.owner.socialSecurityNumber ==
-            personToDelete.socialSecurityNumber);
+    if (personToDelete != null) {
+      final personToDeleteInVehicleListIndex = vehicleRepository.vehicleList
+          .indexWhere((v) =>
+              v.owner.socialSecurityNumber ==
+              personToDelete.socialSecurityNumber);
 
-    personList.remove(personToDelete);
+      personList.remove(personToDelete);
 
-    if (personToDeleteInVehicleListIndex != -1) {
-      vehicleRepository.vehicleList.removeAt(personToDeleteInVehicleListIndex);
+      if (personToDeleteInVehicleListIndex != -1) {
+        vehicleRepository.vehicleList
+            .removeAt(personToDeleteInVehicleListIndex);
+      }
+
+      print(
+          'Du har raderat följande person: ${personToDelete.name} - ${personToDelete.socialSecurityNumber}');
+    } else {
+      getBackToMainPage('Finns ingen person med det angivna personnumret');
     }
-
-    print(
-        'Du har raderat följande person: ${personToDelete.name} - ${personToDelete.socialSecurityNumber}');
   }
 }

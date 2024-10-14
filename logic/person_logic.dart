@@ -111,24 +111,31 @@ class PersonLogic extends SetMain {
       return;
     }
 
-    print('Vill du uppdatera personens namn? Annars tryck Enter: ');
-    var name = stdin.readLineSync();
-    var updatedName;
-    if (name == null || name.isEmpty) {
-      updatedName = '';
-      print('Du gjorde ingen ändring!');
+    final foundPersonIndex = personRepository.personList
+        .indexWhere((i) => i.socialSecurityNumber == socialSecurityNrInput);
+
+    if (foundPersonIndex != -1) {
+      print('Vill du uppdatera personens namn? Annars tryck Enter: ');
+      var name = stdin.readLineSync();
+      var updatedName;
+      if (name == null || name.isEmpty) {
+        updatedName = '';
+        print('Du gjorde ingen ändring!');
+      } else {
+        updatedName = name;
+        personRepository.updatePersons(Person(
+            name: updatedName, socialSecurityNumber: socialSecurityNrInput));
+      }
+
+      print('\nFöljande personer är kvar i listan\n');
+      personRepository.getAllPersons();
+
+      stdout.write('Tryck på något för att komma till huvudmenyn');
+      stdin.readLineSync();
+      setMainPage();
     } else {
-      updatedName = name;
-      personRepository.updatePersons(Person(
-          name: updatedName, socialSecurityNumber: socialSecurityNrInput));
+      getBackToMainPage('Finns ingen person med det angivna personnumret');
     }
-
-    print('\nFöljande personer är kvar i listan\n');
-    personRepository.getAllPersons();
-
-    stdout.write('Tryck på något för att komma till huvudmenyn');
-    stdin.readLineSync();
-    setMainPage();
   }
 
   void _deletePersonLogic() {
@@ -152,12 +159,19 @@ class PersonLogic extends SetMain {
       return;
     }
 
-    personRepository.deletePerson(socialSecurityNrInput);
-    print('\nFöljande personer är kvar i listan\n');
-    personRepository.getAllPersons();
+    final foundPersonIndex = personRepository.personList
+        .indexWhere((i) => i.socialSecurityNumber == socialSecurityNrInput);
 
-    stdout.write('Tryck på något för att komma till huvudmenyn');
-    stdin.readLineSync();
-    setMainPage();
+    if (foundPersonIndex != -1) {
+      personRepository.deletePerson(socialSecurityNrInput);
+      print('\nFöljande personer är kvar i listan\n');
+      personRepository.getAllPersons();
+
+      stdout.write('Tryck på något för att komma till huvudmenyn');
+      stdin.readLineSync();
+      setMainPage();
+    } else {
+      getBackToMainPage('Finns ingen person med det angivna personnumret');
+    }
   }
 }
